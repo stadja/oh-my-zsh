@@ -30,8 +30,20 @@ open_jira_issue () {
   fi
 
   if [ -z "$1" ]; then
-    echo "Opening new issue"
-    $open_cmd "$jira_url/secure/CreateIssue!default.jspa"
+    issue=0
+    if [ -f .jira ]; then
+	issue=$(cat .jira)
+    elif [ -f ~/.jira-url ]; then
+	issue=$(cat ~/.jira-url)
+    fi
+    
+    if [ $issue != 0 ]; then
+	echo "Opening issue #$issue"
+	$open_cmd  "$jira_url/issues/$issue"
+    else
+        echo "Opening new issue"
+        $open_cmd "$jira_url/secure/CreateIssue!default.jspa"
+    fi
   else
     echo "Opening issue #$1"
     if [[ "x$JIRA_RAPID_BOARD" = "xtrue" ]]; then
